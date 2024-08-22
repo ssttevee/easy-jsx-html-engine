@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "declaration": true,
+    "sourceMap": true
+  },
+  "include": ["*.ts"]
+}

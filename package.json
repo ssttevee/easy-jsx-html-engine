@@ -1,0 +1,96 @@
+{
+  "name": "easy-jsx-html-engine",
+  "version": "0.1.0",
+  "description": "Dead simple HTML engine using JSX syntax.",
+  "main": "index.js",
+  "scripts": {
+    "prepack": "npm run build",
+    "build": "tsc",
+    "generate": "node scripts/generate-intrinsics.js",
+    "clean": "rm -f *.js *.js.map *.d.ts"
+  },
+  "type": "module",
+  "keywords": [
+    "easy",
+    "jsx",
+    "html",
+    "engine",
+    "simple",
+    "syntax",
+    "safe",
+    "suspense",
+    "error",
+    "boundary",
+    "stream",
+    "webapi",
+    "intrinsics",
+    "types",
+    "jsx-runtime",
+    "jsx-dev-runtime",
+    "create-element",
+    "clsx",
+    "html-escaper"
+  ],
+  "author": "ssttevee <stevyo99@yahoo.ca>",
+  "license": "MIT",
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "html-escaper": "^3.0.3"
+  },
+  "devDependencies": {
+    "@types/html-escaper": "^3.0.2",
+    "typescript": "^5.5.4"
+  },
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "require": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./stream-webapi": {
+      "import": "./stream-webapi.js",
+      "require": "./stream-webapi.js",
+      "types": "./stream-webapi.d.ts"
+    },
+    "./jsx-runtime": {
+      "import": "./jsx-runtime.js",
+      "require": "./jsx-runtime.js",
+      "types": "./jsx-runtime.d.ts"
+    },
+    "./jsx-dev-runtime": {
+      "import": "./jsx-runtime.js",
+      "require": "./jsx-runtime.js",
+      "types": "./jsx-runtime.d.ts"
+    }
+  },
+  "files": [
+    "jsx",
+    "create-element.js",
+    "create-element.js.map",
+    "create-element.d.ts",
+    "error-boundary.js",
+    "error-boundary.js.map",
+    "error-boundary.d.ts",
+    "index.js",
+    "index.js.map",
+    "index.d.ts",
+    "intrinsics.js",
+    "intrinsics.js.map",
+    "intrinsics.d.ts",
+    "jsx-runtime.js",
+    "jsx-runtime.js.map",
+    "jsx-runtime.d.ts",
+    "stream-webapi.js",
+    "stream-webapi.js.map",
+    "stream-webapi.d.ts",
+    "suspense.js",
+    "suspense.js.map",
+    "suspense.d.ts",
+    "types.js",
+    "types.js.map",
+    "types.d.ts",
+    "util.js",
+    "util.js.map",
+    "util.d.ts"
+  ]
+}
