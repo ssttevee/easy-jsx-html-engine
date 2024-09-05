@@ -17,12 +17,9 @@ class Element {
       attrEntries.length
         ? " " +
           attrEntries
+            .filter(([_, value]) => value || value === 0)
             .map(([key, value]) =>
-              typeof value === "boolean"
-                ? value
-                  ? key
-                  : ""
-                : `${key}="${value}"`,
+              value === true ? key : `${key}="${value.replace(/"/g, '\\"')}"`,
             )
             .join(" ")
         : ""
@@ -102,7 +99,7 @@ export function createElement(
   }
 
   return new Element(name, {
-    ...other,
+    ...escapedAttrs,
     children: childrenToString(normalized),
   });
 }
