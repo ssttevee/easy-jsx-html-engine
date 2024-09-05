@@ -48,7 +48,9 @@ window.suspense={
 
 export interface SuspenseProps {
   // The request ID from renderToStream
-  rid: RequestID;
+  //
+  // If this is not provided, the Suspense component will behave like ErrorBoundary
+  rid?: RequestID;
 
   children?: Children;
 
@@ -60,25 +62,24 @@ export interface SuspenseProps {
 }
 
 export function Suspense(props: SuspenseProps) {
-  const children = normalizeChildren(props.children);
+  const elem = ErrorBoundary({
+    catch: props.catch,
+    children: [props.children],
+  });
   if (
-    !isPromise(children) ||
+    !isPromise(elem) ||
     !props.rid ||
     !SUSPENSE_ROOT.requests.has(props.rid)
   ) {
-    // just pretend this suspense doesn't exist
-    return Fragment({ children });
+    // just pretend this suspense is an error boundary
+    return elem;
   }
 
   const data = SUSPENSE_ROOT.requests.get(props.rid)!;
 
   const id = data.children.length;
 
-  data.children.push(
-    children.then((children) =>
-      ErrorBoundary({ catch: props.catch, children }),
-    ),
-  );
+  data.children.push(Promise.resolve(elem));
 
   return createElement(
     "div",
