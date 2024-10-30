@@ -63,7 +63,11 @@ export function createElement<P extends {} = {}>(
   name: Component<P>,
   attrs?: Omit<P, "children"> &
     (P extends { children?: any } ? PropsWithChildren : {}),
-  ...children: P extends { children?: any } ? Children[] : []
+  ...children: P extends { children?: infer C }
+    ? C extends Array<any>
+      ? C
+      : never
+    : []
 ): JSX.Element;
 
 export function createElement(
@@ -75,10 +79,18 @@ export function createElement(
 export function createElement(
   name: string | Component,
   attrs: JSX.HtmlGlobalAttributes & Record<string, any> = {},
-  ...children: Children[]
+  ...children: any[]
 ): JSX.Element {
   if (typeof name === "function") {
-    return name({ ...attrs, children });
+    const child = name({ ...attrs, children });
+    const normalized = normalizeChildren([child]);
+    if (isPromise(normalized)) {
+      return normalized.then((children) =>
+        dangerouslyPreventEscaping(childrenToString(children)),
+      );
+    }
+
+    return dangerouslyPreventEscaping(childrenToString(normalized));
   }
 
   const { children: _, class: __, ...other } = attrs;

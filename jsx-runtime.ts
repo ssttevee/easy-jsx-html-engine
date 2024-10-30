@@ -7,7 +7,11 @@ export function jsx(
   name: string | Component,
   { children, ...attrs }: Record<string, any>,
 ): JSX.Element {
-  return createElement(name, attrs, children);
+  return createElement(
+    name,
+    attrs,
+    ...(Array.isArray(children) ? children : [children]),
+  );
 }
 
 export { jsx as jsxs, jsx as jsxDEV, Fragment };
