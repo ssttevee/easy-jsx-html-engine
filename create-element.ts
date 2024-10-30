@@ -82,7 +82,7 @@ export function createElement(
   ...children: any[]
 ): JSX.Element {
   if (typeof name === "function") {
-    const child = name({ ...attrs, children });
+    const child = name({ ...attrs, children: children?.length ? children : undefined });
     const normalized = normalizeChildren([child]);
     if (isPromise(normalized)) {
       return normalized.then((children) =>

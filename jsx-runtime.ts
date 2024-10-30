@@ -10,7 +10,7 @@ export function jsx(
   return createElement(
     name,
     attrs,
-    ...(Array.isArray(children) ? children : [children]),
+    ...(children ? Array.isArray(children) ? children : [children] : []),
   );
 }
 
