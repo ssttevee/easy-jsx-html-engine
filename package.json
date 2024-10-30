@@ -1,6 +1,6 @@
 {
   "name": "easy-jsx-html-engine",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Dead simple HTML engine using JSX syntax.",
   "main": "index.js",
   "scripts": {
