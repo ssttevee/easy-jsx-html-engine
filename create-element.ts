@@ -23,7 +23,7 @@ class Element {
             )
             .join(" ")
         : ""
-    }>${isVoidElem(this.name) ? "" : children}</${this.name}>`;
+    }${isVoidElem(this.name) ? "/>" : ">" + children + `</${this.name}>`}`;
   }
 }
 
@@ -82,7 +82,10 @@ export function createElement(
   ...children: any[]
 ): JSX.Element {
   if (typeof name === "function") {
-    const child = name({ ...attrs, children: children?.length ? children : undefined });
+    const child = name({
+      ...attrs,
+      children: children?.length ? children : undefined,
+    });
     const normalized = normalizeChildren([child]);
     if (isPromise(normalized)) {
       return normalized.then((children) =>
