@@ -19,7 +19,9 @@ class Element {
           attrEntries
             .filter(([_, value]) => value || value === 0)
             .map(([key, value]) =>
-              value === true ? key : `${key}="${value.replace(/"/g, '\\"')}"`,
+              value === true
+                ? key
+                : `${key}="${typeof value === "string" ? value.replace(/"/g, '\\"') : value}"`,
             )
             .join(" ")
         : ""
