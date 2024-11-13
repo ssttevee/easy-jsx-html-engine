@@ -96,12 +96,17 @@ export function createElement(
     return dangerouslyPreventEscaping(childrenToString(normalized));
   }
 
-  const { children: _, class: __, ...other } = attrs;
-  const normalized = normalizeChildren(children);
-  if (isPromise(normalized)) {
-    return normalized.then((children) => createElement(name, attrs, children));
+  // remove children from attrs to avoid extra work if it was erroneously passed in as an attribute
+  const { children: _, ...attrsWithoutChildren } = attrs;
+  const normalizedChildren = normalizeChildren(children);
+  const normalizedAttrs = normalizeAttributes(attrsWithoutChildren);
+  if (isPromise(normalizedChildren) || isPromise(normalizedAttrs)) {
+    return Promise.all([normalizedAttrs, normalizedChildren]).then(
+      ([attrs, children]) => createElement(name, attrs, children),
+    );
   }
 
+  const { class: __, ...other } = attrsWithoutChildren;
   const escapedAttrs = Object.fromEntries(
     Object.entries(other).map(([key, value]) => [
       key,
@@ -115,8 +120,27 @@ export function createElement(
 
   return new Element(name, {
     ...escapedAttrs,
-    children: childrenToString(normalized),
+    children: childrenToString(normalizedChildren),
   });
+}
+
+function normalizeAttributes<T extends Record<string, any>>(
+  attrs: T,
+): T | Promise<T> {
+  const entries = Object.entries(attrs);
+  if (entries.some(([, value]) => isPromise(value))) {
+    return Promise.all(
+      entries.map(([key, value]) => {
+        if (isPromise(value)) {
+          return value.then((value) => [key, value]);
+        }
+
+        return [key, value];
+      }),
+    ).then((entries) => Object.fromEntries(entries));
+  }
+
+  return attrs;
 }
 
 class NoEscape {
