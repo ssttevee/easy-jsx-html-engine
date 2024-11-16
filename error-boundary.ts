@@ -38,7 +38,7 @@ export function ErrorBoundary(props: ErrorBoundaryProps) {
   return result.catch(defaultCatch);
 }
 
-function defaultCatch(error: any) {
+export function defaultCatch(error: any) {
   console.error(error);
   return createElement(
     "pre",

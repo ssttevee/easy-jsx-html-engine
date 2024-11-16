@@ -3,7 +3,11 @@ export {
   Fragment,
   dangerouslyPreventEscaping,
 } from "./create-element";
-export { ErrorBoundary, ErrorBoundaryProps } from "./error-boundary";
+export {
+  ErrorBoundary,
+  ErrorBoundaryProps,
+  defaultCatch,
+} from "./error-boundary";
 export {
   Suspense,
   SuspenseProps,
