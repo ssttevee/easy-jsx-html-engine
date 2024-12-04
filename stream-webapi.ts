@@ -89,6 +89,9 @@ async function sendToStream(
         1,
       );
     }
+    await w.write(
+      encoder.encode("<script data-suspense>suspense.cleanup()</script>"),
+    );
   } finally {
     await w.close();
     w.releaseLock();

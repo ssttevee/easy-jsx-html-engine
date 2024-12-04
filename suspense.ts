@@ -1,6 +1,6 @@
 import { ErrorBoundary } from "./error-boundary";
 import type { Children, PropsWithChildren } from "./types";
-import { isPromise, normalizeChildren } from "./util";
+import { isPromise } from "./util";
 import {
   createElement,
   dangerouslyPreventEscaping,
@@ -28,23 +28,33 @@ if (!globalThis.SUSPENSE_ROOT) {
 export type RequestID = string | number;
 
 export const loaderScript = `
-<script id="suspense">
-(function(){
-var d=document,q=d.querySelector.bind(d),a="[data-suspense]#s:",p="div"+a+"p",t="template"+a+"t",s="script"+a+"s";
+<script data-suspense>
+${`(function(
+  d=document,
+  q=d.querySelector.bind(d),
+  m="[data-suspense]",
+  a=m+"#s\\\\:",
+  p="div"+a+"p",
+  t="template"+a+"r",
+  s="script"+a+"s"
+){
 window.suspense={
-  tp(id) {
-    var x = q(p+id),
-        y = q(t+id),
-        z = q(s+id);
+  tp(n) {
+    var x = q(p+n),
+        y = q(t+n),
+        z = q(s+n);
 
-    x.replaceWith(y.content.cloneNode());
+    x.replaceWith(d.importNode(y.content, true));
     y.remove();
     z.remove();
+  },
+  cleanup() {
+    d.querySelectorAll(m).forEach(e => e.remove());
   }
 };
-})()
+})()`.replace(/(?<!var)\s+/g, "")}
 </script>
-`.replace(/\n?\s+/g, "");
+`;
 
 export interface SuspenseProps {
   // The request ID from renderToStream
@@ -113,7 +123,7 @@ export function ResolvedTemplate({ id, children }: ResolvedTemplateProps) {
         "data-suspense": true,
         id: "s:s" + id,
       },
-      dangerouslyPreventEscaping(`suspense.transplant(${id})`),
+      dangerouslyPreventEscaping(`suspense.tp(${id})`),
     ),
   );
 }
