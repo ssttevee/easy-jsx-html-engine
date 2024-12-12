@@ -5,12 +5,17 @@ import { Child, createElement, type Component, Fragment } from "./index";
 
 export function jsx(
   name: string | Component,
-  { children, ...attrs }: Record<string, any>,
+  props: Record<string, any>,
 ): JSX.Element {
+  if (typeof name === "function") {
+    return name(props);
+  }
+
+  const { children, ...attrs } = props;
   return createElement(
     name,
     attrs,
-    ...(children ? Array.isArray(children) ? children : [children] : []),
+    ...(!children ? [] : Array.isArray(children) ? children : [children]),
   );
 }
 

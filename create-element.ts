@@ -65,7 +65,7 @@ export function createElement<P extends {} = {}>(
   name: Component<P>,
   attrs?: Omit<P, "children"> &
     (P extends { children?: any } ? PropsWithChildren : {}),
-  ...children: P extends { children?: infer C }
+  ...children: P extends { children: infer C }
     ? C extends Array<any>
       ? C
       : never
@@ -84,18 +84,14 @@ export function createElement(
   ...children: any[]
 ): JSX.Element {
   if (typeof name === "function") {
-    const child = name({
+    return name({
       ...attrs,
-      children: children?.length ? children : undefined,
+      children: !children?.length
+        ? undefined
+        : children.length === 1
+          ? children[0]
+          : children,
     });
-    const normalized = normalizeChildren([child]);
-    if (isPromise(normalized)) {
-      return normalized.then((children) =>
-        dangerouslyPreventEscaping(childrenToString(children)),
-      );
-    }
-
-    return dangerouslyPreventEscaping(childrenToString(normalized));
   }
 
   // remove children from attrs to avoid extra work if it was erroneously passed in as an attribute
