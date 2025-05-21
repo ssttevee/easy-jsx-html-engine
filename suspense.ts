@@ -1,5 +1,5 @@
 import { ErrorBoundary } from "./error-boundary";
-import type { Children, PropsWithChildren } from "./types";
+import type { Children, Component, PropsWithChildren } from "./types";
 import { isPromise } from "./util";
 import {
   createElement,
@@ -34,25 +34,28 @@ ${`(function(
   q=d.querySelector.bind(d),
   m="[data-suspense]",
   a=m+"#s\\\\:",
-  p="div"+a+"p",
-  t="template"+a+"r",
-  s="script"+a+"s"
 ){
-window.suspense={
+window.suspense = {
   tp(n) {
-    var x = q(p+n),
-        y = q(t+n),
-        z = q(s+n);
+    var x = q("div"+a+"p"+n),
+        y = q("template"+a+"r"+n),
+        z = d.importNode(y.content, true),
+        b = Array.from(z.childNodes);
 
-    x.replaceWith(d.importNode(y.content, true));
+    x.replaceWith(z);
     y.remove();
-    z.remove();
+    q("script"+a+"s"+n).remove();
+
+    return b;
   },
   cleanup() {
     d.querySelectorAll(m).forEach(e => e.remove());
+    delete window.suspense;
   }
 };
-})()`.replace(/(?<!var)\s+/g, "")}
+})()`
+  // poor-man's minify
+  .replace(/(?<!var|return|delete)\s+|[,;]\s*(?=\)|\})/g, "")}
 </script>
 `;
 
@@ -95,35 +98,50 @@ export function Suspense(props: SuspenseProps) {
     "div",
     {
       "data-suspense": true,
-      id: "s:p" + id,
+      id: `s:p${id}`,
     },
     props.fallback,
   );
+}
+
+export interface CreateResolvedTemplateOptions {
+  resolvedScriptMiddleware?: (baseScript: string) => string;
 }
 
 export interface ResolvedTemplateProps extends PropsWithChildren {
   id: number;
 }
 
-export function ResolvedTemplate({ id, children }: ResolvedTemplateProps) {
-  return createElement(
-    Fragment,
-    {},
-    createElement(
-      "template",
-      {
-        "data-suspense": true,
-        id: "s:r" + id,
-      },
-      children,
-    ),
-    createElement(
-      "script",
-      {
-        "data-suspense": true,
-        id: "s:s" + id,
-      },
-      dangerouslyPreventEscaping(`suspense.tp(${id})`),
-    ),
-  );
+export function CreateResolvedTemplate({
+  resolvedScriptMiddleware,
+}: CreateResolvedTemplateOptions = {}): Component<ResolvedTemplateProps> {
+  return function ResolvedTemplate({ id, children }: ResolvedTemplateProps) {
+    let script = `suspense.tp(${id})`;
+    if (resolvedScriptMiddleware) {
+      script = resolvedScriptMiddleware(script);
+    }
+
+    return createElement(
+      Fragment,
+      {},
+      createElement(
+        "template",
+        {
+          "data-suspense": true,
+          id: `s:r${id}`,
+        },
+        children,
+      ),
+      createElement(
+        "script",
+        {
+          "data-suspense": true,
+          id: `s:s${id}`,
+        },
+        dangerouslyPreventEscaping(script),
+      ),
+    );
+  };
 }
+
+export const ResolvedTemplate = CreateResolvedTemplate();

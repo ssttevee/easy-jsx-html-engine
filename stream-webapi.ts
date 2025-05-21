@@ -2,15 +2,36 @@ import {
   type RequestID,
   type RequestData,
   loaderScript,
-  ResolvedTemplate,
+  type ResolvedTemplateProps,
+  ResolvedTemplate as DefaultResolvedTemplate,
 } from "./suspense";
+import type { Component } from "./types";
 
 function noop() {}
 
+export interface RenderToStreamOptions {
+  waitUntil?: (promise: Promise<unknown>) => void;
+  ResolvedTemplate?: Component<ResolvedTemplateProps>;
+}
+
 export function renderToStream(
   body: JSX.Element | ((rid: RequestID) => JSX.Element),
-  waitUntil: (promise: Promise<unknown>) => void = noop,
+  waitUntil?: (promise: Promise<unknown>) => void,
+): ReadableStream<Uint8Array> | Promise<string> | string;
+export function renderToStream(
+  body: JSX.Element | ((rid: RequestID) => JSX.Element),
+  options?: RenderToStreamOptions,
+): ReadableStream<Uint8Array> | Promise<string> | string;
+export function renderToStream(
+  body: JSX.Element | ((rid: RequestID) => JSX.Element),
+  options?: ((promise: Promise<unknown>) => void) | RenderToStreamOptions,
 ): ReadableStream<Uint8Array> | Promise<string> | string {
+  const waitUntil =
+    (typeof options === "object" ? options.waitUntil : options) ?? noop;
+  const ResolvedTemplate =
+    (typeof options === "object" && options.ResolvedTemplate) ||
+    DefaultResolvedTemplate;
+
   const rid: RequestID = globalThis.SUSPENSE_ROOT.counter++;
 
   const requestData: RequestData = { children: [] };
@@ -38,7 +59,7 @@ export function renderToStream(
   const { readable, writable } = new TransformStream();
 
   waitUntil(
-    sendToStream(writable, body, requestData).finally(() => {
+    sendToStream(writable, body, requestData, ResolvedTemplate).finally(() => {
       // Removes the current state
       SUSPENSE_ROOT.requests.delete(rid);
     }),
@@ -51,6 +72,7 @@ async function sendToStream(
   writable: WritableStream,
   layout: JSX.Element,
   requestData: RequestData,
+  ResolvedTemplate: Component<ResolvedTemplateProps>,
 ) {
   const w = writable.getWriter();
   try {

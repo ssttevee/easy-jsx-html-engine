@@ -9,9 +9,12 @@ export {
   defaultCatch,
 } from "./error-boundary";
 export {
+  CreateResolvedTemplate,
+  CreateResolvedTemplateOptions,
   Suspense,
   SuspenseProps,
   RequestID as SuspenseRequestID,
+  ResolvedTemplateProps,
 } from "./suspense";
 export type {
   Component,
