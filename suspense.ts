@@ -144,4 +144,4 @@ export function CreateResolvedTemplate({
   };
 }
 
-export const ResolvedTemplate = CreateResolvedTemplate();
+export const ResolvedTemplate = /* @__PURE__ */ CreateResolvedTemplate();
