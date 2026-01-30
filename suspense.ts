@@ -105,7 +105,7 @@ export function Suspense(props: SuspenseProps) {
 }
 
 export interface CreateResolvedTemplateOptions {
-  resolvedScriptMiddleware?: (baseScript: string) => string;
+  resolvedScriptMiddleware?: (baseScript: string, id: number) => string;
 }
 
 export interface ResolvedTemplateProps extends PropsWithChildren {
@@ -118,7 +118,7 @@ export function CreateResolvedTemplate({
   return function ResolvedTemplate({ id, children }: ResolvedTemplateProps) {
     let script = `suspense.tp(${id})`;
     if (resolvedScriptMiddleware) {
-      script = resolvedScriptMiddleware(script);
+      script = resolvedScriptMiddleware(script, id);
     }
 
     return createElement(
